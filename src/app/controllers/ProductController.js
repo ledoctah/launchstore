@@ -21,7 +21,7 @@ module.exports = {
 
         for(key of keys) {
             if(req.body[key] == ''){
-                return res.body('Please, fill all fields');
+                return res.send('Please, fill all fields');
             }
         }
 
