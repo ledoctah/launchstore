@@ -27,7 +27,12 @@ module.exports = {
 
         if(req.files.length == 0) return res.send('Please, send at least one image');
 
-        let results = await Product.create(req.body);
+        const data = {
+            ...req.body,
+            user_id: req.session.userId
+        }
+
+        let results = await Product.create(data);
         const productId = results.rows[0].id;
 
         const filesPromise = req.files.map(file => File.create({...file, product_id: productId }));
@@ -89,7 +94,6 @@ module.exports = {
 
         for(key of keys) {
             if(req.body[key] == '' && key != 'removed_files'){
-                console.log(key)
                 return res.send('Please, fill all fields');
             }
         }
