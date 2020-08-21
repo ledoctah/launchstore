@@ -35,7 +35,7 @@ module.exports = {
             await User.update(user.id, {
                 reset_token: token,
                 reset_token_expires: now
-            })
+            });
     
             // enviar email com um link de recuperação de senha
             await mailer.sendMail({

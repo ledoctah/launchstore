@@ -1,6 +1,9 @@
 DROP DATABASE IF EXISTS launchstoredb;
 CREATE DATABASE launchstoredb;
 
+DROP DATABASE IF EXISTS launchstoredb;
+CREATE DATABASE launchstoredb;
+
 CREATE TABLE "products" (
   "id" SERIAL PRIMARY KEY,
   "category_id" int,
@@ -42,12 +45,14 @@ CREATE TABLE "users" (
   "cpf_cnpj" text UNIQUE NOT NULL,
   "cep" text,
   "address" text,
+  "reset_token" text,
+  "reset_token" text,
   "created_at" timestamp DEFAULT 'now()',
   "updated_at" timestamp DEFAULT 'now()'
 );
 
 -- foreign key
-ALTER TABLE "products" ADD FOREIGN KEY ("user_id") REFERENCES users "users" ("id");
+ALTER TABLE "products" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("id");
 
 -- create procedure
 CREATE FUNCTION trigger_set_timestamp()
@@ -94,3 +99,13 @@ DROP CONSTRAINT files_product_id_fkey,
 ADD CONSTRAINT files_product_id_fkey
 FOREIGN KEY (product_id) REFERENCES products(id)
 ON DELETE CASCADE;
+
+-- to run seeds
+DELETE FROM products;
+DELETE FROM users;
+DELETE FROM files;
+
+-- restart sequence auto_increment from tables ids
+ALTER SEQUENCE products_id_seq RESTART WITH 1;
+ALTER SEQUENCE users_id_seq RESTART WITH 1;
+ALTER SEQUENCE files_id_seq RESTART WITH 1;

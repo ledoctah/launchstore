@@ -1,5 +1,21 @@
 const db = require('../../config/db');
 
+function find(filters, table) {
+    let query = `SELECT * FROM ${table}`;
+
+    if(filters) {
+        Object.keys(filters).map(key => {
+            query += ` ${key}`
+    
+            Object.keys(filters[key]).map(field => {
+                query += ` ${field} = '${filters[key][field]}'`
+            });
+        });
+    }
+
+    return db.query(query);
+}
+
 const Base = {
     init({ table }) {
         if(!table) throw new Error('Invalid Params');
@@ -8,21 +24,20 @@ const Base = {
 
         return this;
     },
-    async findOne(filters) {
-        let query = `SELECT * FROM ${this.table}`;
-
-        Object.keys(filters).map(key => {
-            query = `${query}
-            ${key}`
-
-            Object.keys(filters[key]).map(field => {
-                query = `${query} ${field} = '${filters[key][field]}'`
-            });
-        });
-
-        const results = await db.query(query);
+    async find(id) {
+        const results = await find({ where: { id} }, this.table);
 
         return results.rows[0];
+    },
+    async findOne(filters) {
+        const results = await find(filters, this.table);
+
+        return results.rows[0];
+    },
+    async findAll(filters) {
+        const results = await find(filters, this.table);
+
+        return results.rows;
     },
     async create(fields) {
         try {
@@ -31,7 +46,7 @@ const Base = {
 
             Object.keys(fields).map(key => {
                 keys.push(key);
-                values.push(fields[key]);
+                values.push(`'${fields[key]}'`);
             });
 
             const query = `INSERT INTO ${this.table} (${keys.join(',')}) 
